@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+  
+    <h1><%= title %></h1>
+     <div class="eform">
+      <form action="/signup" method="post">
+        <fieldset>
+            <legend>signup form</legend>
+            <% if(msg != ''){ %>
+              <p style="text-align: center"><%= msg %></p> 
+           <% } %>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="" placeholder="Enter name" required>
+            </div>
+
+               <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="" placeholder="Enter email" required> 
+            </div>
+         
+            <div class="form-group">
+                <label for="pwd">password</label>
+                <input type="password" id="pwd" name="pwd" value="" placeholder="Enter pwd" required>
+            </div>
+
+              <div class="form-group">
+                <label for="cpwd">confirm password</label>
+                <input type="password" id="cpwd" name="cpwd" value="" placeholder="Enter cpwd" required>
+            </div>
+         
+         
+              <input class="btn" type="submit" type="button" name="submit" value="submit">
+        </fieldset>
+         <p class="signup">Already have an account<a href="/">Login Here</a></p>
+    </form>
+    </div>
+  </body>
+</html>
