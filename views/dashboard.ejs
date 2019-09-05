@@ -5,8 +5,10 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
@@ -41,25 +43,8 @@
     </ul>
   </div>
 </nav>
-    <h1><%= title %></h1>
-
-     <div class="eform">
-      <form action="/add_new_category" method="post">
-        <fieldset>
-            <legend>Add New Category form</legend>
-            <% if(errors !=''){ %>
-              <p style="text-align: center; color: rgb(158, 74, 74)"><%= errors.passwordCategory.msg %></p>
-            <% } %>
-            <div class="form-group">
-                <label for="name">Add New Category Name</label>
-                <input type="text" id="name" name="passwordCategory" value="" placeholder="Enter Your Password Category">
-            </div>
-          
-              <input class="btn" type="submit" type="button" name="submit" value="Add New Category">
-        </fieldset>
-         <p><a href="/passwordCategory">View All Category list</a></p>
-    </form>
-    </div>
-
+    <h1>User Dashboard</h1>
+   
+    
     </body>
 </html>
