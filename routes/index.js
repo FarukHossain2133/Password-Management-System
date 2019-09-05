@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var userModule = require('../module/users')
+var userModule = require('../module/users');
+var passwordCategoryModel = require('../module/password_category');
 var bcruptjs = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
+
+var getAllPassCat = passwordCategoryModel.find({});
 
 
 // Login Middleware if save token in localstorage
@@ -82,7 +85,7 @@ router.post('/', function(req, res, next) {
 
     }
    
-  })
+  });
  
 }); 
 
@@ -129,23 +132,65 @@ router.post('/signup', checkUserName, checkEmail, function(req, res, next) {
 
 
 router.get('/add_new_category',  checkLoginUser, function(req, res, next) {
-  var loginUser = localStorage.getItem('loginUser')
-  res.render('addNewCategory', { title: 'password management system', loginUser: loginUser, errors: ''});
-});
+  var loginUser = localStorage.getItem('loginUser');
+      res.render('addNewCategory', { title: 'password management system', loginUser: loginUser, errors: '', success: ''});
+  });
 
 router.post('/add_new_category',  checkLoginUser, [check('passwordCategory', 'Enter Your Password Category').isLength({min: 1 })], function(req, res, next) {
   var loginUser = localStorage.getItem('loginUser')
   const errors =  validationResult(req);
  if(!errors.isEmpty()){
-   res.render('addNewCategory', { title: 'password management system', loginUser: loginUser, errors: errors.mapped()});
+   res.render('addNewCategory', { title: 'password management system', loginUser: loginUser, errors: errors.mapped(), success: ''});
  }else{
-    res.render('addNewCategory', { title: 'password management system', loginUser: loginUser, errors: ''});
+    var passCatName = req.body.passwordCategory;
+    var passDetails = new passwordCategoryModel({ pws_category: passCatName});
+    passDetails.save((err, data) => {
+      if(err) throw new err;
+          res.render('addNewCategory', { title: 'password management system', loginUser: loginUser, errors: '', success: 'Password Category Inserted Successfully'});
+    });
  }
 });
 
 router.get('/passwordCategory', checkLoginUser, function(req, res, next) {
   var loginUser = localStorage.getItem('loginUser')
-  res.render('password_category', { title: 'password management system', loginUser: loginUser});
+  getAllPassCat.exec((err, data) => {
+    if(err) throw new err;
+  res.render('password_category', { title: 'password management system', loginUser: loginUser, records: data});
+});
+});
+
+// Delete a password category
+router.get('/passwordCategory/delete/:id', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+  var passCatId = req.params.id;
+  var passDelete = passwordCategoryModel.findByIdAndDelete(passCatId);
+  passDelete.exec((err) => {
+    if(err) throw new err;
+ res.redirect('/passwordCategory');
+});
+});
+
+// Update a password category 
+router.get('/passwordCategory/edit/:id', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+  var passCatId = req.params.id;
+  var getPassCat = passwordCategoryModel.findById(passCatId);
+  getPassCat.exec((err, data) => {
+    if(err) throw new err;
+    res.render('edit_password_category', { title: 'password management system', loginUser: loginUser, errors: '', success: '',  records: data , id: passCatId});
+});
+});
+
+// Update a password category with post method
+router.post('/passwordCategory/edit', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+  var passCatId = req.body.id;
+  var passCatName = req.body.passwordCategory;
+  var updatePassCat = passwordCategoryModel.findByIdAndUpdate(passCatId, {pws_category: passCatName});
+  updatePassCat.exec((err, data) => {
+    if(err) throw new err;
+     res.redirect('/passwordCategory');
+  });
 });
 
 router.get('/add_new_password', checkLoginUser, function(req, res, next) {
@@ -163,4 +208,5 @@ router.get('/logout', function(req, res, next) {
   localStorage.removeItem('loginUser');
    res.redirect('/');
 });
+
 module.exports = router;
