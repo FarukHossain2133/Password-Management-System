@@ -2,11 +2,14 @@ var express = require('express');
 var router = express.Router();
 var userModule = require('../module/users');
 var passwordCategoryModel = require('../module/password_category');
+var passwordDetailsModel = require('../module/add_password');
 var bcruptjs = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 
 var getAllPassCat = passwordCategoryModel.find({});
+var getAllPassDetails = passwordDetailsModel.find({});
+
 
 
 // Login Middleware if save token in localstorage
@@ -82,9 +85,7 @@ router.post('/', function(req, res, next) {
       res.redirect('/dashboard');
     }else {
       res.render('index', { title: 'password management system', msg: 'Invalid Username or Password'});
-
     }
-   
   });
  
 }); 
@@ -193,14 +194,81 @@ router.post('/passwordCategory/edit', checkLoginUser, function(req, res, next) {
   });
 });
 
+// Add category Details 
 router.get('/add_new_password', checkLoginUser, function(req, res, next) {
   var loginUser = localStorage.getItem('loginUser')
-  res.render('add_new_password', { title: 'password management system', loginUser: loginUser});
+  getAllPassCat.exec((err, data) => {
+    if(err) throw new err;
+    res.render('add_new_password', { title: 'password management system', loginUser: loginUser, options: data , success: ''});
+  })
+});
+
+// Add category Details Post Method
+router.post('/add_new_password', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+  var passwordName =  req.body.pass_name;
+  var projectName =  req.body.projectName;
+  var passwordDetails =  req.body.pass_details;
+  var password_details = new passwordDetailsModel({
+    password_category: passwordName,
+    project_name: projectName,
+    password_details: passwordDetails
+  });
+
+  password_details.save((err, data) => {
+    if(err) throw new err;
+    getAllPassCat.exec((err, opt) => {
+      if(err) throw new err;
+    res.render('add_new_password', { title: 'password management system', loginUser: loginUser, options: opt, success: 'Data Inserted Successfully'});
+  })
+})
 });
 
 router.get('/view-all-password-list', checkLoginUser, function(req, res, next) {
-  var loginUser = localStorage.getItem('loginUser')
-  res.render('view-all-password-list', { title: 'password management system',  loginUser: loginUser});
+  var loginUser = localStorage.getItem('loginUser');
+  getAllPassDetails.exec((err, data) => {
+    if(err) throw new err;
+     res.render('view-all-password-list', { title: 'password management system',  loginUser: loginUser, records: data});
+  })
+});
+
+router.get('/password_details', checkLoginUser, function(req, res, next) {
+   res.redirect('/dashboard');
+});
+
+router.get('/password_details/edit/:id', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+  var passID =  req.params.id;
+  var getOnePassDetails = passwordDetailsModel.findById(passID);
+  getOnePassDetails.exec((err, data) => {
+    if(err) throw new err;
+     res.render('edit_pass_details', { title: 'password management system',  loginUser: loginUser, success: '', record: data});
+  })
+});
+
+router.post('/password_details/edit/:id', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+  var passID =  req.params.id;
+  var pass_cate = req.body.pass_cate;
+  var projectName = req.body.projectName;
+  var pass_details = req.body.pass_details;
+  var getUpdatedDetails = passwordDetailsModel.findByIdAndUpdate(passID,
+    {password_category: pass_cate,
+      project_name: projectName,
+      password_details: pass_details
+     });
+    getUpdatedDetails.exec((err, data) => {
+    if(err) throw new err;
+      res.redirect('/view-all-password-list');
+  })
+});
+
+router.get('/password_details/delete/:id', checkLoginUser, (req, res) =>{
+     var deleteID =  req.params.id;
+     passwordDetailsModel.findByIdAndDelete(deleteID).exec((err, data) => {
+       if(err) throw new err;
+         res.redirect('/view-all-password-list');
+     })
 });
 
 router.get('/logout', function(req, res, next) {

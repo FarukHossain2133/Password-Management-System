@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
+  <head> 
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="https://cdn.ckeditor.com/4.12.1/standard/ckeditor.js"></script>
   </head>
   <body>
   <nav class="navbar navbar-default" id="category">
@@ -45,53 +43,39 @@
 </nav>
     <h1><%= title %></h1>
 
-<div class='table-body'>
-    <table class='table'>
-    <caption> View All Password Lists </caption>
-      <thead>
-        <tr>
-          <th>Password Category Name</th>
-          <th>Project Name</th>
-          <th> Action</th>
-        </tr>
-      </thead>
-      <tbody> 
-        <% if(records.length > 0){
-            records.forEach(function(row){ %>
-              <tr>
-                    <td> <%= row.password_category %> </td>
-                    <td> <%= row.project_name %> </td>
-                    <td class="all_btn">
-                      <button type="button" class="" id="btn-eye" data-toggle="modal" data-target="#myModal<%= row._id %>"><i class="fa fa-eye"></i></button>
-                       <a id="btn-edit" href="/password_details/edit/<%= row._id %>"><i class="fa fa-edit"></i></a>
-                      <a id="btn-delete" href="/password_details/delete/<%= row._id %>" onclick=" return confirm('Are you sure to delete this category?')"><i class="fa fa-trash"></i></a>
-                    </td>
-              </tr>
-              
-      <div class="modal fade" id="myModal<%= row._id %>" role="dialog">
-        <div class="modal-dialog">
+     <div class="eform">
+      <form action="/password_details/edit/<%= record._id %>" method="post">
+        <fieldset>
+            <legend>Edit Password Details</legend>
+            <input type="hidden" value="<%= record._id %>" name="id">
+            <% if(success != ''){ %>
+                 <p style="text-align: center"> <%= success %></p>
+            <% } %>
+            <div class="form-group">
+                  <label for="pass_details">password category</label>
+                  <select name="pass_cate" id="pass_details" class="form-control">
+                     <option value="<%= record.password_category %>"> <%= record.password_category %> </option>
+                   </select>
+            </div>
+
+            <div class="form-group">
+                <label for="project">Project Name</label>
+                <input type="text" id="project" name="projectName" value="<%= record.project_name %>" placeholder="Enter Your Project Name">
+            </div>
         
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title"><%= row.project_name %></h4>
+            <div class="form-group">
+                <label for="editor">password Details</label>
+                <textarea type="text" id="editor" name="pass_details" placeholder="Enter Your Password Details" rows="5"><%= record.password_details %></textarea>
             </div>
-            <div class="modal-body">
-              <%- row.password_details%>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-         <% }) } %>
-           
-         
-      </tbody>
-    </table>
+               
+              <input class="btn" type="submit" type="button" name="submit" value="Update Password Details">
+        </fieldset>
+         <p class=""><a href="/view-all-password-list">View All password lists</a></p>
+    </form>
     </div>
+    <script>
+      CKEDITOR.replace( 'editor' );
+    </script>
 
     </body>
 </html>
