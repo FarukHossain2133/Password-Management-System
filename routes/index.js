@@ -220,15 +220,99 @@ router.post('/add_new_password', checkLoginUser, function(req, res, next) {
     getAllPassCat.exec((err, opt) => {
       if(err) throw new err;
     res.render('add_new_password', { title: 'password management system', loginUser: loginUser, options: opt, success: 'Data Inserted Successfully'});
-  })
-})
+  });
+});
 });
 
+
+/* 
+// Pagination GET
 router.get('/view-all-password-list', checkLoginUser, function(req, res, next) {
   var loginUser = localStorage.getItem('loginUser');
-  getAllPassDetails.exec((err, data) => {
+    var perPage = 3;
+    var page = 1;
+
+    getAllPassDetails.skip((perPage * page) - perPage)
+    .limit(perPage)
+    .exec((err, data) => {
     if(err) throw new err;
-     res.render('view-all-password-list', { title: 'password management system',  loginUser: loginUser, records: data});
+    passwordDetailsModel.countDocuments({}).exec((err, count) => {
+     res.render('view-all-password-list', { title: 'password management system', 
+        loginUser: loginUser,
+        records: data, 
+        current: page,
+        pages: Math.ceil(count / perPage)
+      });
+    });
+  });
+});
+
+  // Pagination 
+router.get('/view-all-password-list/:page', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+    var perPage = 3;
+    var page =  req.params.page || 1;
+
+    getAllPassDetails.skip((perPage * page) - perPage)
+    .limit(perPage)
+    .exec((err, data) => {
+    if(err) throw new err;
+    passwordDetailsModel.countDocuments({}).exec((err, count) => {
+     res.render('view-all-password-list', {
+        title: 'password management system', 
+        loginUser: loginUser,
+        records: data, 
+        current: page,
+        pages: Math.ceil(count / perPage)
+      });
+    })
+  })
+});
+
+*/
+
+
+// Pagination GET 
+router.get('/view-all-password-list', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+
+    var options = {
+      offset:   1, 
+      limit:    3
+    };
+
+    passwordDetailsModel.paginate({}, options).then(function(result){
+      console.log(result)
+     res.render('view-all-password-list', { title: 'password management system', 
+        loginUser: loginUser,
+        records: result.docs, 
+        current: result.offset,
+        pages: Math.ceil(result.total / result.limit)
+      });
+    });
+    
+});
+
+
+ // Pagination 
+ router.get('/view-all-password-list/:page', checkLoginUser, function(req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
+    var perPage = 3;
+    var page =  req.params.page || 1;
+
+    getAllPassDetails.skip((perPage * page) - perPage)
+    .limit(perPage)
+    .exec((err, data) => {
+    if(err) throw new err;
+    passwordDetailsModel.countDocuments({}).exec((err, count) => {
+     res.render('view-all-password-list', {
+        title: 'password management system', 
+        loginUser: loginUser,
+        records: data, 
+        current: page,
+        pages: Math.ceil(count / perPage)
+      });
+    })
   })
 });
 
