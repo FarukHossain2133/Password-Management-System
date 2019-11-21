@@ -216,7 +216,7 @@ router.post('/add_new_password', checkLoginUser, function(req, res, next) {
   });
 
   password_details.save((err, data) => {
-    if(err) throw new err;
+    // if(err) throw new err;
     getAllPassCat.exec((err, opt) => {
       if(err) throw new err;
     res.render('add_new_password', { title: 'password management system', loginUser: loginUser, options: opt, success: 'Data Inserted Successfully'});
